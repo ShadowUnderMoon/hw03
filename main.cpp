@@ -31,8 +31,8 @@ auto operator+(std::vector<T1> const &a, std::vector<T2> const &b) {
 template <class T1, class T2>
 std::variant<T1, T2> operator+(std::variant<T1, T2> const &a, std::variant<T1, T2> const &b) {
     // 请实现自动匹配容器中具体类型的加法！10 分
-    return std::visit([&] (const auto& x, const auto& y) {
-        return std::variant<T1, T2>(x + y);
+    return std::visit([&] (const auto& x, const auto& y) -> std::variant<T1, T2> {
+        return x + y;
     }, a, b);
 }
 
@@ -46,6 +46,17 @@ std::ostream &operator<<(std::ostream &os, std::variant<T1, T2> const &a) {
     return os;
 }
 
+template <class T1, class T2, class T3>
+auto operator+(std::variant<T1, T2> const& a, const T3& b) {
+    std::variant<T1, T2> c = b;
+    return a + c;
+}
+
+template <class T1, class T2, class T3>
+auto operator+(const T3& a, const std::variant<T1, T2>& b) {
+    std::variant<T1, T2> c = a;
+    return c + b;
+}
 int main() {
     std::vector<int> a = {1, 4, 2, 8, 5, 7};
     std::cout << a << std::endl;
@@ -61,8 +72,7 @@ int main() {
 
     std::variant<std::vector<int>, std::vector<double>> d = c;
     std::variant<std::vector<int>, std::vector<double>> e = a;
-    d = d + std::variant<std::vector<int>, std::vector<double>>(c) + e;
-    // d = d + e;
+    d = d + c + e;
 
     // 应该输出 {9.28, 17.436, 7.236}
     std::cout << d << std::endl;
